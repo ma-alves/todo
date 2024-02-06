@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling >= 1.13.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "todo"
+description = ""
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Matheus Vinícius", email = "matheusvialves@outlook.com" },
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+[tool.blue]
+extend-exclude = '(migrations/)'
+
+[tool.taskipy.tasks]
+format = 'blue .'
+run = 'uvicorn todo.main:app --reload'
+test = 'pytest -s -x --cov=todo -vv'
+post_test = 'coverage html'
