@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from todo.database import get_session
+from todo.database import get_session, Session
 from todo.main import app
 from todo.models import Base, User
 
@@ -11,7 +11,7 @@ import pytest
 
 
 @pytest.fixture
-def client(session):
+def client(session: Session):
     def get_session_override():
         return session
     
@@ -36,7 +36,7 @@ def session():
 
 
 @pytest.fixture
-def user(session):
+def user(session: Session):
     user = User(username='Teste', email='test@test.com', password='Testtest')
     session.add(user)
     session.commit()

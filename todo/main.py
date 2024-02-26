@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from .database import get_session
 from .models import User
-from .schemas import UserList, UserPublic, UserSchema
+from .schemas import Message, UserList, UserPublic, UserSchema
 
 
 app = FastAPI()
@@ -21,6 +21,16 @@ def read_users(
 ):
     users = session.scalars(select(User).offset(skip).limit(limit)).all()
     return {'users': users}
+
+
+@app.get('/users/{user_id}', response_model=UserPublic)
+def read_user(user_id: int, session: Session = Depends(get_session)):
+    db_user = session.scalar(select(User).where(User.id == user_id))
+
+    if not db_user:
+        raise HTTPException(404, detail='Usuário não encontrado.')
+
+    return db_user
 
 
 @app.post('/users/', response_model=UserPublic, status_code=201)
@@ -48,15 +58,28 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 def update_user(
     user_id: int, user: UserSchema, session: Session = Depends(get_session)
 ):
-    user_db = session.scalar(select(User).where(User.id == user_id))
-    if not user_db:
+    db_user = session.scalar(select(User).where(User.id == user_id))
+
+    if not db_user:
         raise HTTPException(404, detail='Usuário não encontrado!')
     
-    user_db.username = user.username
-    user_db.password = user.password
-    user_db.email = user.email
+    db_user.username = user.username
+    db_user.password = user.password
+    db_user.email = user.email
     session.commit()
-    session.refresh(user_db)
+    session.refresh(db_user)
 
-    return user_db
+    return db_user
 
+
+@app.delete('/users/{user_id}', response_model=Message)
+def delete_user(user_id: int, session: Session = Depends(get_session)):
+    db_user = session.scalar(select(User).where(User.id == user_id))
+
+    if not db_user:
+        raise HTTPException(404, detail='Usuário não encontrado!')
+    
+    session.delete(db_user)
+    session.commit()
+
+    return {'message': 'Usuário deletado.'}
