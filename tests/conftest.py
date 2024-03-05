@@ -6,6 +6,7 @@ from sqlalchemy.pool import StaticPool
 from todo.database import get_session, Session
 from todo.main import app
 from todo.models import Base, User
+from todo.security import get_password_hash
 
 import pytest
 
@@ -37,9 +38,24 @@ def session():
 
 @pytest.fixture
 def user(session: Session):
-    user = User(username='Teste', email='test@test.com', password='Testtest')
+    user = User(
+        username='Teste',
+        email='test@test.com',
+        password=get_password_hash('Testtest')
+    )
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    user.clean_password = 'Testtest'
+
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    return response.json()['access_token']
