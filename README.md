@@ -1,0 +1,2 @@
+# Backend Todo App
+Projeto baseado no curso de FastAPI do Eduardo Mendes (@dunossauro), utilizando o framework web FastAPI, SQLite como banco de dados, SQLAlchemy como ORM, Pytest para criação de testes, e Alembic para migrações. Sistema sendo desenvolvido com a abordagem de Test Driven Development.
