@@ -11,20 +11,25 @@ from sqlalchemy.orm import Session
 from todo.database import get_session
 from todo.models import User
 from todo.schemas import TokenData
+from todo.settings import Settings
 
 
-SECRET_KEY = 'your-secret-key'
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+settings = Settings()
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
+
 def create_access_token(data: dict):
-    '''Cria um novo token JWT para autenticar o usuário.'''
+    """Cria um novo token JWT para autenticar o usuário."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({'exp': expire}) # Aqui é onde o payload é formado
-    encoded_jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    expire = datetime.utcnow() + timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    to_encode.update({'exp': expire})   # Aqui é onde o payload é formado
+    encoded_jwt = encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+
     return encoded_jwt
 
 
@@ -37,8 +42,8 @@ def verify_password(plain_password: str, hashed_password: str):
 
 
 async def get_current_user(
-        session: Session = Depends(get_session),
-        token: str = Depends(oauth2_scheme)
+    session: Session = Depends(get_session),
+    token: str = Depends(oauth2_scheme),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,19 +52,21 @@ async def get_current_user(
     )
 
     try:
-        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         username: str = payload.get('sub')
         if not username:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JOSEError: # alterado de maneira freestyle
+    except JOSEError:   # alterado de maneira freestyle
         raise credentials_exception
-    
+
     user = session.scalar(
         select(User).where(User.email == token_data.username)
     )
 
     if user is None:
         raise credentials_exception
-    
+
     return user
