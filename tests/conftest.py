@@ -8,7 +8,18 @@ from todo.main import app
 from todo.models import Base, User
 from todo.security import get_password_hash
 
+import factory
 import pytest
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    id = factory.Sequence(lambda n: n)
+    username = factory.LazyAttribute(lambda obj: f'test{obj.id}')
+    email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
+    password = factory.LazyAttribute(lambda obj: f'{obj.username}@example.com')
 
 
 @pytest.fixture
@@ -38,16 +49,28 @@ def session():
 
 @pytest.fixture
 def user(session: Session):
-    user = User(
-        username='Teste',
-        email='test@test.com',
-        password=get_password_hash('Testtest')
-    )
+    password = 'testtest'
+    user = UserFactory(password=get_password_hash(password))
+
     session.add(user)
     session.commit()
     session.refresh(user)
 
-    user.clean_password = 'Testtest'
+    user.clean_password = 'testtest'
+
+    return user
+
+
+@pytest.fixture
+def other_user(session: Session):
+    password = 'testtest'
+    user = UserFactory(password=get_password_hash(password))
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    user.clean_password = 'testtest'
 
     return user
 

@@ -70,9 +70,9 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_user_has_no_perm(client, user, token):
+def test_update_user_with_wrong_user(client, other_user, token):
     response = client.put(
-        '/users/400',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'outro',
@@ -93,9 +93,9 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'Usuário deletado.'}
 
 
-def test_delete_user_has_no_perm(client, user, token):
+def test_delete_user_with_wrong_user(client, other_user, token):
     response = client.delete(
-        '/users/404',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
     assert response.status_code == 400
@@ -103,9 +103,9 @@ def test_delete_user_has_no_perm(client, user, token):
 
 
 def test_read_one_user(client, user):
-    response = client.get('/users/1')
+    response = client.get(f'/users/{user.id}')
     assert response.status_code == 200
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'test@test.com',
+        'username': f'{user.username}',
+        'email': f'{user.email}',
     }

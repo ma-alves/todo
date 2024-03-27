@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose.jwt import decode, encode
-from jose.exceptions import JOSEError
+from jose.exceptions import JOSEError, ExpiredSignatureError
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -60,6 +60,8 @@ async def get_current_user(
             raise credentials_exception
         token_data = TokenData(username=username)
     except JOSEError:   # alterado de maneira freestyle
+        raise credentials_exception
+    except ExpiredSignatureError:
         raise credentials_exception
 
     user = session.scalar(
