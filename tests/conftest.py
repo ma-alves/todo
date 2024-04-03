@@ -3,23 +3,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from tests.factories import UserFactory
 from todo.database import get_session, Session
 from todo.main import app
 from todo.models import Base, User
 from todo.security import get_password_hash
 
-import factory
 import pytest
-
-
-class UserFactory(factory.Factory):
-    class Meta:
-        model = User
-
-    id = factory.Sequence(lambda n: n)
-    username = factory.LazyAttribute(lambda obj: f'test{obj.id}')
-    email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
-    password = factory.LazyAttribute(lambda obj: f'{obj.username}@example.com')
 
 
 @pytest.fixture

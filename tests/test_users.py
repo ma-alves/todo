@@ -40,7 +40,7 @@ def test_create_user_already_exists(client):
             'password': 'secret',
         }
     )
-    print(response_again.json())
+
     assert response_again.status_code == 400
     assert response_again.json() == {
         'detail': 'Usuário já existe'

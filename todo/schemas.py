@@ -1,8 +1,36 @@
+from todo.models import TodoState
+
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class Message(BaseModel):
     message: str
+
+
+# Valida dados de entrada
+class TodoSchema(BaseModel):
+    title: str
+    description: str
+    state: TodoState
+
+
+# Valida dados de saída
+class TodoPublic(BaseModel):
+    id: int
+    title: str
+    description: str
+    state: TodoState
+
+
+class TodoList(BaseModel):
+    todos: list[TodoPublic]
+
+
+# Atributos são opcionais pois nem todos são atualizados - PATCH method
+class TodoUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    state: str | None = None
 
 
 class Token(BaseModel):
