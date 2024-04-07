@@ -28,6 +28,7 @@ iniconfig==2.0.0
 Mako==1.3.2
 MarkupSafe==2.1.5
 mccabe==0.6.1
+mslex==1.2.0
 mypy-extensions==1.0.0
 packaging==23.2
 passlib==1.7.4
@@ -35,6 +36,7 @@ pathspec==0.12.1
 platformdirs==4.1.0
 pluggy==1.4.0
 psutil==5.9.8
+psycopg2-binary==2.9.9
 pyasn1==0.5.1
 pycodestyle==2.8.0
 pycparser==2.21

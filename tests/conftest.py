@@ -1,15 +1,27 @@
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from tests.factories import UserFactory
 from todo.database import get_session, Session
 from todo.main import app
-from todo.models import Base, User
+from todo.models import Base
 from todo.security import get_password_hash
+from todo.settings import Settings
 
 import pytest
+
+
+@pytest.fixture
+def session():
+    engine = create_engine(Settings().DATABASE_URL) 
+    Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(engine)
+    with Session() as session:
+        yield session 
+        session.rollback()
+    
+    Base.metadata.drop_all(engine) 
 
 
 @pytest.fixture
@@ -22,19 +34,6 @@ def client(session: Session):
         yield client
 
     app.dependency_overrides.clear()
-
-
-@pytest.fixture
-def session():
-    engine = create_engine(
-        'sqlite:///:memory:',
-        connect_args={'check_same_thread' : False},
-        poolclass=StaticPool,
-        ) # cria o banco na memória
-    Base.metadata.create_all(engine) # cria as tabelas do bd de teste
-    Session = sessionmaker(bind=engine) # cria uma fábrica de sessões
-    yield Session() # fornece uma instância de Session que será injetada em cada teste que solicita a fixture session
-    Base.metadata.drop_all(engine) # após cada teste que usa a fixture session, o banco é deletado
 
 
 @pytest.fixture
