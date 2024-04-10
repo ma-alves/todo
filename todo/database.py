@@ -6,7 +6,7 @@ from todo.settings import Settings
 
 
 engine = create_engine(Settings().DATABASE_URL)
-Base.metadata.create_all(engine) # se não der certo, apagar
+Base.metadata.create_all(engine)
 
 
 def get_session():

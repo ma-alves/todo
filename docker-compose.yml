@@ -3,12 +3,13 @@ version: '3'
 services:
   todo_db:
     image: postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: app_user
       POSTGRES_DB: app_db
       POSTGRES_PASSWORD: app_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+#      - pgtest:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -27,3 +28,4 @@ services:
 
 volumes:
   pgdata:
+#  pgtest:

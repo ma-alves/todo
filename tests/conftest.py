@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 from tests.factories import UserFactory
-from todo.database import get_session, Session
+from todo.database import get_session
 from todo.main import app
 from todo.models import Base
 from todo.security import get_password_hash
